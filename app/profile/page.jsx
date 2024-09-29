@@ -5,19 +5,24 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Profile from "@components/Profile";
+import Loading from "@components/Loading"; // Import the Loading component
 
 const MyProfile = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
   const [myPosts, setMyPosts] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const fetchPosts = async () => {
+      setLoading(true); // Set loading to true before fetching
+
       const response = await fetch(`/api/users/${session?.user.id}/posts`);
       const data = await response.json();
 
       setMyPosts(data);
+      setLoading(false); // Set loading to false once data is fetched
     };
 
     if (session?.user.id) fetchPosts();
@@ -46,6 +51,10 @@ const MyProfile = () => {
       }
     }
   };
+
+  if (loading) {
+    return <Loading />; // Show the loading screen if data is being fetched
+  }
 
   return (
     <Profile
